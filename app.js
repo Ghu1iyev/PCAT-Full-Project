@@ -2,7 +2,7 @@ const express = require('express');
 const ejs = require('ejs');
 const path = require('path');
 const mongoose = require('mongoose')
-const {Photo} = require('./models/Photo')
+const Photo = require('./models/Photo')
 const app = express();
 
 //Connect DB
@@ -22,8 +22,11 @@ app.use(express.json()) // for parsing application/json
 app.use(express.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
 
 //Routes
-app.get('/', (req, res) => {
-  res.render('index');
+app.get('/', async(req, res) => {
+    const photos = await Photo.find({})
+  res.render('index',{
+    photos
+  });
 });
 
 app.get('/about', (req,res) => {
@@ -34,8 +37,8 @@ app.get('/add', (req,res) => {
     res.render('add')
 })
 
-app.post('/photos',(req,res) => {
-    console.log(req.body);
+app.post('/photos',async (req,res) => {
+   await Photo.create(req.body)
     res.redirect('/')
 })
 
