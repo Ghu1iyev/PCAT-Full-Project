@@ -28,7 +28,9 @@ app.use(express.static('public'));
 app.use(express.json()); // for parsing application/json
 app.use(express.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 app.use(fileUpload());
-app.use(methodOverride('_method'))
+app.use(methodOverride('_method', {
+    methods:['POST','GET']
+}))
 
 //Routes
 app.get('/', async (req, res) => {
@@ -90,7 +92,13 @@ app.put('/photos/:id', async(req, res) => {
     res.redirect(`/photos/${req.params.id}`)
   });
   
-
+app.delete('/photos/:id', async(req,res) => {
+    const photo = await Photo.findOne({_id: req.params.id})
+    let deletedImage = __dirname + '/public' + photo.image;
+    fs.unlinkSync(deletedImage)
+    await Photo.findByIdAndRemove(req.params.id)
+    res.redirect('/')
+})
 
 app.listen(3000, () => {
   console.log('Server is started');
